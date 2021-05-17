@@ -317,13 +317,33 @@ contract CoinToken is PausableToken {
 }
 
 contract Investelly is CoinToken {
+    uint256 public _taxFee = 2;
+    uint256 private _previousTaxFee = _taxFee;
+
+    uint256 public _liquidityFee = 3;
+    uint256 private _previousLiquidityFee = _liquidityFee;
+
     constructor()
-        public CoinToken(
-            "Investelly",
-            "IVT",
-            9,
-            450000000,
-            msg.sender
-        )
+        public
+        CoinToken("Investelly", "IVT", 9, 450000000, msg.sender)
     {}
+
+    function removeAllFee() private {
+        if (_taxFee == 0 && _liquidityFee == 0) return;
+
+        _previousTaxFee = _taxFee;
+        _previousLiquidityFee = _liquidityFee;
+
+        _taxFee = 0;
+        _liquidityFee = 0;
+    }
+
+    function restoreAllFee() private {
+        _taxFee = _previousTaxFee;
+        _liquidityFee = _previousLiquidityFee;
+    }
+
+    function setLiquidityFeePercent(uint256 liquidityFee) external onlyOwner() {
+        _liquidityFee = liquidityFee;
+    }
 }
