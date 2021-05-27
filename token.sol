@@ -1,4 +1,9 @@
+/**
+ *Submitted for verification at BscScan.com on 2021-05-27
+*/
+
 // SPDX-License-Identifier: MIT
+
 pragma solidity ^0.5.17;
 
 library SafeMath {
@@ -310,5 +315,41 @@ contract CoinToken is PausableToken {
         balances[account] = balances[account].add(amount);
         emit Mint(address(0), account, amount);
         emit Transfer(address(0), account, amount);
+    }
+}
+
+contract Investelly is CoinToken {
+    uint256 public _taxFee = 5;
+    uint256 private _previousTaxFee = _taxFee;
+
+    uint256 public _liquidityFee = 7;
+    uint256 private _previousLiquidityFee = _liquidityFee;
+
+    constructor()
+        public
+        CoinToken("Investelly", "INVESTELLY", 9, 450000000, msg.sender)
+    {}
+
+    function removeAllFee() private {
+        if (_taxFee == 0 && _liquidityFee == 0) return;
+
+        _previousTaxFee = _taxFee;
+        _previousLiquidityFee = _liquidityFee;
+
+        _taxFee = 0;
+        _liquidityFee = 0;
+    }
+
+    function restoreAllFee() private {
+        _taxFee = _previousTaxFee;
+        _liquidityFee = _previousLiquidityFee;
+    }
+
+    function setTaxFee(uint256 taxFee) external onlyOwner() {
+        _taxFee = taxFee;
+    }
+
+    function setLiquidityFeePercent(uint256 liquidityFee) external onlyOwner() {
+        _liquidityFee = liquidityFee;
     }
 }
