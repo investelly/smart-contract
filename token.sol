@@ -1,6 +1,10 @@
 /**
- *Submitted for verification at BscScan.com on 2021-05-27
+ *Submitted for verification at BscScan.com on 2021-06-09
 */
+
+/**
+ *Submitted for verification at BscScan.com on 2021-05-27
+ */
 
 // SPDX-License-Identifier: MIT
 
@@ -318,16 +322,56 @@ contract CoinToken is PausableToken {
     }
 }
 
-contract Investelly is CoinToken {
-    uint256 public _taxFee = 5;
+contract Whitelist is Pausable {
+  uint8 public constant version = 1;
+
+  mapping (address => bool) private whitelistedMap;
+
+  event Whitelisted(address indexed account, bool isWhitelisted);
+
+  function whitelisted(address _address)
+    public
+    view
+    returns (bool)
+  {
+    if (paused) {
+      return false;
+    }
+
+    return whitelistedMap[_address];
+  }
+
+  function addWhiteList(address _address)
+    public
+    onlyOwner
+  {
+    require(whitelistedMap[_address] != true);
+    whitelistedMap[_address] = true;
+    emit Whitelisted(_address, true);
+  }
+
+  function removeWhiteList(address _address)
+    public
+    onlyOwner
+  {
+    require(whitelistedMap[_address] != false);
+    whitelistedMap[_address] = false;
+    emit Whitelisted(_address, false);
+  }
+}
+
+contract Investelly is CoinToken, Whitelist {
+    uint256 public _taxFee = 2;
     uint256 private _previousTaxFee = _taxFee;
 
-    uint256 public _liquidityFee = 7;
+    uint256 public _liquidityFee = 5;
+    string public name = "Investelly";
+    string public symbol = "INVESTEL";
     uint256 private _previousLiquidityFee = _liquidityFee;
 
     constructor()
         public
-        CoinToken("Investelly", "INVESTELLY", 9, 450000000, msg.sender)
+        CoinToken(name, symbol, 9, 450000000, msg.sender)
     {}
 
     function removeAllFee() private {
